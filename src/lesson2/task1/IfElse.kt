@@ -1,7 +1,9 @@
 @file:Suppress("UNUSED_PARAMETER")
+
 package lesson2.task1
 
 import lesson1.task1.discriminant
+import lesson1.task1.sqr
 import kotlin.math.max
 import kotlin.math.sqrt
 
@@ -62,7 +64,17 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * Мой возраст. Для заданного 0 < n < 200, рассматриваемого как возраст человека,
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
-fun ageDescription(age: Int): String = TODO()
+fun ageDescription(age: Int): String {
+    if (age % 100 in 11..14) {
+        return ("$age лет")
+    } else when (age % 10) {
+        1 -> return ("$age год")
+        2 -> return ("$age года")
+        3 -> return ("$age года")
+        4 -> return ("$age года")
+        else -> return ("$age лет")
+    }
+}
 
 /**
  * Простая
@@ -73,7 +85,15 @@ fun ageDescription(age: Int): String = TODO()
  */
 fun timeForHalfWay(t1: Double, v1: Double,
                    t2: Double, v2: Double,
-                   t3: Double, v3: Double): Double = TODO()
+                   t3: Double, v3: Double): Double {
+    val s1 = v1 * t1
+    val s2 = v2 * t2
+    val s3 = v3 * t3
+    val s = (s1 + s2 + s3) / 2
+    if (s <= s1) return s / v1
+    else if (s <= (s1 + s2)) return t1 + (s - s1) / v2
+    else return t1 + t2 + (s - s1 - s2) / v3
+}
 
 /**
  * Простая
@@ -86,7 +106,12 @@ fun timeForHalfWay(t1: Double, v1: Double,
  */
 fun whichRookThreatens(kingX: Int, kingY: Int,
                        rookX1: Int, rookY1: Int,
-                       rookX2: Int, rookY2: Int): Int = TODO()
+                       rookX2: Int, rookY2: Int): Int {
+    var underAttack = 0
+    if (kingX == rookX1 || kingY == rookY1) underAttack += 1
+    if (kingX == rookX2 || kingY == rookY2) underAttack += 2
+    return underAttack
+}
 
 /**
  * Простая
@@ -100,7 +125,16 @@ fun whichRookThreatens(kingX: Int, kingY: Int,
  */
 fun rookOrBishopThreatens(kingX: Int, kingY: Int,
                           rookX: Int, rookY: Int,
-                          bishopX: Int, bishopY: Int): Int = TODO()
+                          bishopX: Int, bishopY: Int): Int {
+    var underAttack = 0
+    val dx: Int
+    val dy: Int
+    if (kingX == rookX || kingY == rookY) underAttack += 1
+    if (kingX > bishopX) dx = kingX - bishopX else dx = bishopX - kingX
+    if (kingY > bishopY) dy = kingY - bishopY else dy = bishopY - kingY
+    if (dx == dy) underAttack += 2
+    return underAttack
+}
 
 /**
  * Простая
@@ -110,7 +144,27 @@ fun rookOrBishopThreatens(kingX: Int, kingY: Int,
  * прямоугольным (вернуть 1) или тупоугольным (вернуть 2).
  * Если такой треугольник не существует, вернуть -1.
  */
-fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
+fun triangleKind(a: Double, b: Double, c: Double): Int {
+    //проверим, существует ли треугольник
+    if (a < (b + c) && b < (a + c) && c < (a + b)) {
+        //длинная сторона
+        var longSide = 1
+        if (b > a && b > c) longSide = 2
+        else if (c > a && c > b) longSide = 3
+        //из теоремы косинусов
+        val angle: Double
+        when (longSide) {
+            1 -> angle = sqr(b) + sqr(c) - sqr(a)
+            2 -> angle = sqr(a) + sqr(c) - sqr(b)
+            else -> angle = sqr(a) + sqr(b) - sqr(c)
+        }
+        when {
+            angle < 0 -> return 2
+            angle > 0 -> return 0
+            else -> return 1
+        }
+    } else return -1
+}
 
 /**
  * Средняя
@@ -120,4 +174,10 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
  * Найти длину пересечения отрезков AB и CD.
  * Если пересечения нет, вернуть -1.
  */
-fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int = TODO()
+fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
+    return if (c > b || a > d) -1 //начало одного отрезка за пределами конца другого
+    else if (a <= c && c <= b && d >= b) b - c //пересекаются или совпадают, первый раньше начинается или кончается
+    else if (a >= c && b <= d) b - a //первый отрезок внутри второго
+    else if (c >= a && d <= b) d - c //второй отрезок внутри первого
+    else d - a //пересекаются, но второй начинается или кончается раньше первого
+}
