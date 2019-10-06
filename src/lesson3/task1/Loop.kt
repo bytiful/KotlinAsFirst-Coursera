@@ -71,11 +71,14 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun digitNumber(n: Int): Int =
-        when {
-            n < 10 -> 1
-            else -> digitNumber(n / 10) + 1
-        }
+fun digitNumber(n: Int): Int {
+    var nn = n
+    if (nn < 0) nn *= -1
+    return when {
+        nn < 10 -> 1
+        else -> digitNumber(nn / 10) + 1
+    }
+}
 
 
 /**
@@ -84,12 +87,26 @@ fun digitNumber(n: Int): Int =
  * Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
-fun fib(n: Int): Int =
-        when {
-            n == 1 -> 1
-            n == 2 -> 1
-            else -> fib(n - 1) + fib(n - 2)
+fun fib(n: Int): Int {
+    var fib1 = 1
+    var fib2 = 1
+    var curFib = 0
+    when {
+        n == 1 -> return fib1
+        n == 2 -> return fib2
+        else -> {
+            for (i in 3..n) {
+                curFib = (fib1 + fib2)
+                fib1 = fib2
+                fib2 = curFib
+            }
+            return curFib
         }
+    }
+}
+/*
+        fib(n - 1) + fib(n - 2)}
+*/
 
 /**
  * Простая
@@ -98,17 +115,17 @@ fun fib(n: Int): Int =
  * минимальное число k, которое делится и на m и на n без остатка
  */
 fun lcm(m: Int, n: Int): Int {
-    var k = m
-    if (n > m) {
-        k = n
-    } //выбрали наибольшиее число k = max(m, n)
-    for (i in k..(m * n)) { //поиск перебором от наибольшего из заданных, до произведения заданных чисел
-        if ((i % m == 0) && (i % n == 0)) {
-            k = i
-            break //если нашли, то прекращаем поиск
-        }
+
+    //найдем наибольший общий делитель (НОД) по алгоритму Евклида
+    var a = max(m, n)
+    var b = min(m, n)
+    var c: Int
+    while (a % b != 0) {
+        c = a % b
+        a = b
+        b = c
     }
-    return k
+    return m * n / b
 }
 
 /**
@@ -118,11 +135,15 @@ fun lcm(m: Int, n: Int): Int {
  */
 fun minDivisor(n: Int): Int {
     var result = n
-    for (i in 2..n / 2) {
-        if (n % i == 0) {
-            result = i
-            break
+    if (n % 2 != 0) {
+        for (i in 3..sqrt(n.toDouble()).toInt() step 2) {
+            if (n % i == 0) {
+                result = i
+                break
+            }
         }
+    } else {
+        result = 2
     }
     return result
 }
@@ -161,13 +182,17 @@ fun isCoPrime(m: Int, n: Int): Boolean {
     var a = max(m, n)
     var b = min(m, n)
     var c: Int
-    do {
-        c = a % b
-        a = b
-        b = c
-    } while (b > 1)
-    //для взаимно простых чисел НОД = 1
-    return b == 1
+    if (b != 1) {
+        do {
+            c = a % b
+            a = b
+            b = c
+        } while (b > 1)
+        //для взаимно простых чисел НОД = 1
+        return b == 1
+    } else {
+        return true
+    }
 }
 
 /**
@@ -365,16 +390,10 @@ fun squareSequenceDigit(n: Int): Int {
         curSqr = m * m
 
         //число цифр в текущем квадрате
-        sqrLen = 0
-        while (curSqr > 9) {
-            sqrLen++
-            curSqr /= 10
-        }
-        sqrLen++
+        sqrLen = digitNumber(curSqr)
 
         //число цифр в последовательности
         seqLen += sqrLen
-        curSqr = m * m
     }
 
     //последовательность длиной n
@@ -400,7 +419,6 @@ fun fibSequenceDigit(n: Int): Int {
     var seqLen = 0
     var curFib = 0
     var m = 0
-    var temp: Int
 
     //последовательность длиной не меньше n
     while (seqLen < n) {
@@ -408,15 +426,9 @@ fun fibSequenceDigit(n: Int): Int {
         //новый элемент последовательности
         m++
         curFib = fib(m)
-        temp = curFib
 
-        //число цифр в текущем квадрате
-        fibLen = 0
-        while (temp > 9) {
-            fibLen++
-            temp /= 10
-        }
-        fibLen++
+        //число цифр в текущем элементе
+        fibLen = digitNumber(curFib)
 
         //число цифр в последовательности
         seqLen += fibLen
