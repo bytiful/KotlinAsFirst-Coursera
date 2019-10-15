@@ -332,8 +332,13 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean {
-    for (i in 0 until word.length) {
-        if (word[i] !in chars) return false
+    val lowCaseWord = word.toLowerCase()
+    var lowCaseChars = listOf<Char>()
+    for (c in chars) {
+        lowCaseChars += c.toLowerCase()
+    }
+    for (i in 0 until lowCaseWord.length) {
+        if (lowCaseWord[i] !in lowCaseChars) return false
     }
     return true
 }
@@ -379,7 +384,8 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun hasAnagrams(words: List<String>): Boolean {
-    if (words.isEmpty() || (words.size == 1)) return false
+    if (words.isEmpty()) return false
+    if (words.size == 1) return false
     val charsInCurrentWord = mutableListOf<Char>()
     //для слов списка, кроме последнего
     for (i in 0..(words.size - 2)) {
