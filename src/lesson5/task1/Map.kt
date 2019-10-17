@@ -498,17 +498,25 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                         break
                     }
                     summaryPrice += heightAndPrice.second
-                    //убрать в маске первый символ
-                    currentmask = currentmask.substring(1)
-                    //если маска пустая, то закончить
-                    if (currentmask.isEmpty()) break
                 }
+                //убрать в маске первый символ
+                currentmask = currentmask.substring(1)
+                //если маска пустая, то закончить
+                if (currentmask.isEmpty()) break
             }
             //проверка кандидата
-            if ((summaryHeight < capacity) && (summaryPrice > bestSum)) bestSet = i
+            if (summaryHeight <= capacity) {
+                if (summaryPrice > bestSum) {
+                    bestSet = i
+                    bestSum = summaryPrice
+                }
+            }
         }
         //номер сета перевести в сет
         var currentMask = bestSet.toString(2)
+        while (currentMask.length < n) {
+            currentMask = "0$currentMask"
+        }
         for ((treasure, heightAndPrice) in treasures) {
             if (currentMask.first() == '1') {
                 result = result + treasure
