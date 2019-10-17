@@ -335,7 +335,7 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean {
     val lowCaseWord = word.toLowerCase()
     var lowCaseChars = listOf<Char>()
     for (c in chars) {
-        lowCaseChars += c.toLowerCase()
+        lowCaseChars = lowCaseChars + c.toLowerCase()
     }
     for (i in 0 until lowCaseWord.length) {
         if (lowCaseWord[i] !in lowCaseChars) return false
@@ -397,6 +397,7 @@ fun hasAnagrams(words: List<String>): Boolean {
         //проверим оставшиеся элемены списка слов
         for (j in (i + 1) until words.size) {
             var candidatWrd = words[j]
+            if (candidatWrd == currentWrd) return true
             if (candidatWrd.length != currentWrd.length) { //совпадают по длине?
                 continue //нет - продолжаем
             } else {     //да - вычёркиваем совпадающие буквы
@@ -466,4 +467,55 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *     450
  *   ) -> emptySet()
  */
-fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> = TODO()
+fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
+    var result = setOf<String>()
+    var bestSum = 0
+    var bestSet = 0
+    val n = treasures.size
+    //теоретическое число вариантов
+    var numOfVatiants: Int
+    if (n > 0) {
+        numOfVatiants = 1
+        for (i in 0 until n) {
+            numOfVatiants *= 2
+        }
+        numOfVatiants--
+
+
+        //просмотрим все варианты
+        for (i in 1..numOfVatiants) {
+            var currentmask = i.toString(2)
+            while (currentmask.length < n) {
+                currentmask = "0$currentmask"
+            }
+            var summaryHeight = 0
+            var summaryPrice = 0
+            for ((treasure, heightAndPrice) in treasures) {
+                if (currentmask.first() == '1') {
+                    summaryHeight += heightAndPrice.first
+                    if (summaryHeight > capacity) {
+                        //перевес
+                        break
+                    }
+                    summaryPrice += heightAndPrice.second
+                    //убрать в маске первый символ
+                    currentmask = currentmask.substring(1)
+                    //если маска пустая, то закончить
+                    if (currentmask.isEmpty()) break
+                }
+            }
+            //проверка кандидата
+            if ((summaryHeight < capacity) && (summaryPrice > bestSum)) bestSet = i
+        }
+        //номер сета перевести в сет
+        var currentMask = bestSet.toString(2)
+        for ((treasure, heightAndPrice) in treasures) {
+            if (currentMask.first() == '1') {
+                result = result + treasure
+            }
+            currentMask = currentMask.substring(1)
+            if (currentMask.isEmpty()) break
+        }
+    }
+    return result
+}
