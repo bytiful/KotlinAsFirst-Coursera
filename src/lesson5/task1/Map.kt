@@ -470,10 +470,10 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
     var result = setOf<String>()
     var bestSum = 0
-    var bestSet = 0
+    var bestSet = 0L
     val n = treasures.size
     //теоретическое число вариантов
-    var numOfVatiants: Int
+    var numOfVatiants: Long
     if (n > 0) {
         numOfVatiants = 1
         for (i in 0 until n) {

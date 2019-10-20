@@ -2,6 +2,8 @@
 
 package lesson6.task1
 
+import kotlin.math.max
+
 /**
  * Пример
  *
@@ -49,12 +51,10 @@ fun main(args: Array<String>) {
         val seconds = timeStrToSeconds(line)
         if (seconds == -1) {
             println("Введённая строка $line не соответствует формату ЧЧ:ММ:СС")
-        }
-        else {
+        } else {
             println("Прошло секунд с начала суток: $seconds")
         }
-    }
-    else {
+    } else {
         println("Достигнут <конец файла> в процессе чтения строки. Программа прервана")
     }
 }
@@ -71,7 +71,39 @@ fun main(args: Array<String>) {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+fun dateStrToDigit(str: String): String {
+    val daysInMonth = mapOf<String, Int>("января" to 31, "февраля" to 29, "марта" to 31, "апреля" to 30, "мая" to 31,
+            "июня" to 30, "июля" to 31, "августа" to 31, "сентября" to 30, "октября" to 31,
+            "ноября" to 30, "декабря" to 31)
+    val numberOfMounth = mapOf<String, Int>("января" to 1, "февраля" to 2, "марта" to 3, "апреля" to 4, "мая" to 5,
+            "июня" to 6, "июля" to 7, "августа" to 8, "сентября" to 9, "октября" to 10,
+            "ноября" to 11, "декабря" to 12)
+    var result = ""
+    val parts = str.split(' ')
+    if (parts.size == 3) {
+        try {
+            val d = parts[0].toInt()
+            val m = parts[1]
+            val y = parts[2].toInt()
+            if (m in daysInMonth) {
+                if (d <= daysInMonth[m]!!.toInt()) {
+                    if (numberOfMounth[m] == 2) {
+                        //проверить на високосный год
+                        if (!((y % 400 == 0) || ((y % 4 == 0) && (y % 100 != 0)))) {
+                            if (d > 28) {
+                                return result
+                            }
+                        }
+                    }
+                    result = String.format("%02d.%02d.%d", d, numberOfMounth[m], y)
+                }
+            }
+        } catch (e: NumberFormatException) {
+            return result
+        }
+    }
+    return result
+}
 
 /**
  * Средняя
@@ -83,7 +115,48 @@ fun dateStrToDigit(str: String): String = TODO()
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30 февраля 2009) считается неверными
  * входными данными.
  */
-fun dateDigitToStr(digital: String): String = TODO()
+fun dateDigitToStr(digital: String): String {
+    var result = ""
+    val parts = digital.split(".")
+    if (parts.size != 3) return result
+    try {
+        val d = parts[0].toInt()
+        val m = parts[1].toInt()
+        val y = parts[2].toInt()
+        val isLeapYear = ((y % 400 == 0) || ((y % 4 == 0) && (y % 100 != 0)))
+        //проверка корректности ввода
+        val OK: Boolean
+        when (m) {
+            1, 3, 5, 7, 8, 10, 12 -> OK = (d in 1..31)
+            2 -> OK = isLeapYear && (d in 1..29) || (d in 1..28)
+            4, 6, 9, 11 -> OK = (d in 1..30)
+            else -> OK = false
+        }
+        if (OK) {
+            result = d.toString()
+            when (m) {
+                1 -> result += " января "
+                2 -> result += " февраля "
+                3 -> result += " марта "
+                4 -> result += " апреля "
+                5 -> result += " мая "
+                6 -> result += " июня "
+                7 -> result += " июля "
+                8 -> result += " августа "
+                9 -> result += " сентября"
+                10 -> result += " октября "
+                11 -> result += " ноября "
+                12 -> result += " декабря "
+            }
+            result += parts[2]
+        }
+
+    } catch (e: NumberFormatException) {
+        return result
+    }
+
+    return result
+}
 
 /**
  * Средняя
@@ -97,7 +170,22 @@ fun dateDigitToStr(digital: String): String = TODO()
  * Все символы в номере, кроме цифр, пробелов и +-(), считать недопустимыми.
  * При неверном формате вернуть пустую строку
  */
-fun flattenPhoneNumber(phone: String): String = TODO()
+fun flattenPhoneNumber(phone: String): String {
+    val validCh = setOf<Char>('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', ' ', '(', ')')
+    var result = ""
+    //проверим правильность символов
+    for (ch in phone) {
+        if (ch !in validCh) {
+            return ""
+        } else {
+            when (ch) {
+                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+' -> result += ch
+            }
+        }
+    }
+
+    return result
+}
 
 /**
  * Средняя
@@ -109,7 +197,24 @@ fun flattenPhoneNumber(phone: String): String = TODO()
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int = TODO()
+fun bestLongJump(jumps: String): Int {
+    val validCh = setOf<Char>('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '%', '-', ' ')
+    var result = -1
+    //проверим символы на правильность
+    for (ch in jumps) {
+        if (ch !in validCh) return -1
+    }
+    val jump = jumps.split(" ")
+    for (j in jump) {
+        try {
+            val l = j.toInt()
+            result = max(result, l)
+        } catch (e: NumberFormatException) {
+            continue
+        }
+    }
+    return result
+}
 
 /**
  * Сложная
@@ -121,7 +226,30 @@ fun bestLongJump(jumps: String): Int = TODO()
  * Прочитать строку и вернуть максимальную взятую высоту (230 в примере).
  * При нарушении формата входной строки вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
+fun bestHighJump(jumps: String): Int {
+    var result = -1
+    val validCh = setOf<Char>('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '%', '-', ' ', '+')
+    for (ch in jumps) {
+        if (ch !in validCh) return -1
+    }
+    val records = jumps.split(" ")
+    for (i in 0 until records.size) {
+        try {
+            val height = records[i].toInt()
+            if(i <= records.size - 2) {
+                if ('+' in records[i+1]) {
+                    result = max(result, height)
+                }
+            } else {
+                return -1
+            }
+        } catch (e: java.lang.NumberFormatException) {
+            continue
+        }
+    }
+
+    return result
+}
 
 /**
  * Сложная
