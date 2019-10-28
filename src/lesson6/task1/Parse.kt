@@ -2,6 +2,8 @@
 
 package lesson6.task1
 
+//import java.lang.IllegalArgumentException
+import kotlin.IllegalArgumentException
 import kotlin.math.max
 
 /**
@@ -236,8 +238,8 @@ fun bestHighJump(jumps: String): Int {
     for (i in 0 until records.size) {
         try {
             val height = records[i].toInt()
-            if(i <= records.size - 2) {
-                if ('+' in records[i+1]) {
+            if (i <= records.size - 2) {
+                if ('+' in records[i + 1]) {
                     result = max(result, height)
                 }
             } else {
@@ -260,7 +262,50 @@ fun bestHighJump(jumps: String): Int {
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int = TODO()
+fun plusMinus(expression: String): Int {
+    var result = 0
+    val validNum = setOf<Char>('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
+    val validSign = setOf<Char>('-', ' ', '+')
+
+    for (ch in expression) {
+        if ((ch !in validNum) && (ch !in validSign)) {
+            throw IllegalArgumentException("Illegal symbol '$ch' in expression")
+            //println("Illegal symbol '$ch' in expression")
+        }
+    }
+
+    val ars = expression.split(" ")
+    if (ars.size % 2 == 0) throw IllegalArgumentException("Wrong number of arguments")
+    var isTerm = true
+
+    for (i in 0 until ars.size) {
+        try {
+            if (isTerm) { //обрабатываем число
+                for (ch in ars[i]) {
+                    if (ch !in validNum) throw IllegalArgumentException("Wrong number")
+                }
+                val n = ars[i].toInt()
+                if (i == 0) {
+                    result = n
+                } else {
+                    when (ars[i - 1]) {
+                        "+" -> result += n
+                        "-" -> result -= n
+                        else -> throw IllegalArgumentException("Illegal argument")
+                    }
+                }
+            } else { //обрабатываем действие
+                if ((ars[i] != "+") && (ars[i] != "-")) {
+                    throw IllegalArgumentException("Illegal argument")
+                }
+            }
+            isTerm = !isTerm
+        } catch (e: java.lang.NumberFormatException) {
+            throw IllegalArgumentException("Illegal argument")
+        }
+    }
+    return result
+}
 
 /**
  * Сложная
@@ -271,7 +316,22 @@ fun plusMinus(expression: String): Int = TODO()
  * Вернуть индекс начала первого повторяющегося слова, или -1, если повторов нет.
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
-fun firstDuplicateIndex(str: String): Int = TODO()
+fun firstDuplicateIndex(str: String): Int {
+    val inString = str.toLowerCase()
+    val wrds = inString.split(" ")
+    var n = 0
+    if (wrds.size > 1) {
+        for (i in 1 until wrds.size) {
+            if (wrds[i -1] == wrds[i]) {
+                return n
+            } else {
+                n += wrds[i - 1].length + 1
+            }
+        }
+    }
+    return -1
+}
+
 
 /**
  * Сложная
@@ -284,7 +344,27 @@ fun firstDuplicateIndex(str: String): Int = TODO()
  * или пустую строку при нарушении формата строки.
  * Все цены должны быть больше либо равны нуля.
  */
-fun mostExpensive(description: String): String = TODO()
+fun mostExpensive(description: String): String {
+    if (description.isBlank()) return ""
+    val descs = description.split("; ")
+    var candidateToExpensive = ""
+    var expensivePrice = -1.0f
+    for (i in 0 until descs.size){
+        val goodsInf = descs[i].split(" ")
+        if (goodsInf.size != 2) return ""
+        try {
+            val price = goodsInf[1].toFloat()
+            if (price > expensivePrice) {
+                candidateToExpensive = goodsInf[0]
+                expensivePrice = price
+            }
+        } catch (e: java.lang.NumberFormatException) {
+            return ""
+        }
+    }
+    if (candidateToExpensive.isNotBlank()) return candidateToExpensive
+    return ""
+}
 
 /**
  * Сложная
@@ -297,7 +377,32 @@ fun mostExpensive(description: String): String = TODO()
  *
  * Вернуть -1, если roman не является корректным римским числом
  */
-fun fromRoman(roman: String): Int = TODO()
+fun fromRoman(roman: String): Int {
+    val romanNum = mapOf('I' to 1, 'V' to 5, 'X' to 10, 'L' to 50, 'C' to 100, 'D' to 500, 'M' to 1000)
+    var result = 0
+    var listOfArabicNum = listOf<Int>()
+    //проверим корректность символов
+    for (ch in roman) {
+        if (romanNum[ch] == null) {
+            return -1
+        } else {
+            //переведём каждый символ в число
+            listOfArabicNum = listOfArabicNum + romanNum[ch]!!
+        }
+    }
+    //проверим корректность чисел
+    //вычислим результат
+    var pevriousNum = 0
+    for (num in listOfArabicNum) {
+        if (pevriousNum < num) {
+            result -= (2 * pevriousNum)
+        }
+        pevriousNum = num
+        result += num
+    }
+
+    return result
+}
 
 /**
  * Очень сложная
@@ -335,4 +440,85 @@ fun fromRoman(roman: String): Int = TODO()
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    val symbs = setOf<Char>('>', '<', '+', '-', '[', ']', ' ')
+    var adr = cells / 2
+    var stepCounter = 0
+
+    //проверим на ошибочные символы и правильность скобок
+    var bracketsCount = 0
+    for (ch in commands) {
+        if (ch !in symbs) throw IllegalArgumentException("Invalid command $ch")
+        when (ch) {
+            '[' -> bracketsCount++
+            ']' -> bracketsCount--
+        }
+        if (bracketsCount < 0) throw IllegalArgumentException("No pair brackets")
+    }
+    if (bracketsCount != 0) throw IllegalArgumentException("No pair brackets")
+
+    //создадим ячейки
+    val mem = (1..cells).toMutableList()
+    mem.fill(0)
+
+    //выполение программы
+    var charToExecute = 0
+    while (stepCounter < limit) {
+
+        //исполнение одной команды
+        when (commands[charToExecute]) {
+            '>' -> {
+                adr++
+                if (adr >= cells) throw IllegalStateException("Out of range ($adr)")
+                charToExecute++
+            }
+            '<' -> {
+                adr--
+                if (adr < 0) throw IllegalStateException("Out of range ($adr)")
+                charToExecute++
+            }
+            '+' -> {
+                mem[adr]++
+                charToExecute++
+            }
+            '-' -> {
+                mem[adr]--
+                charToExecute++
+            }
+            '[' -> {
+                if (mem[adr] == 0) {
+                    //найдём парную закрывающую скобку
+                    bracketsCount = 1
+                    charToExecute++
+                    while (bracketsCount !=0) {
+                        if (commands[charToExecute] == '[') bracketsCount++
+                        if (commands[charToExecute] == ']') bracketsCount--
+                        charToExecute++
+                    }
+                } else {
+                    charToExecute++
+                }
+            }
+            ']' -> {
+                if (mem[adr] != 0) {
+                    //найдём парную открывающую скобку
+                    bracketsCount = 1
+                    charToExecute--
+                    while (bracketsCount !=0) {
+                        if (commands[charToExecute] == ']') bracketsCount++
+                        if (commands[charToExecute] == '[') bracketsCount--
+                        charToExecute--
+                    }
+                    charToExecute +=2
+                } else {
+                    charToExecute++
+                }
+            }
+            ' ' -> charToExecute++
+
+        }
+        stepCounter++
+        if (charToExecute == commands.length) break
+    }
+    return mem
+}
