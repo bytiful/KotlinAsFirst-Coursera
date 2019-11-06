@@ -711,10 +711,11 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var i = 0
     for (ch in lhvString) {
         i++
+        if (flag) diffString = "${diffString.toInt()}"
         diffString += ch
-        var s = " "
-        for (n in 1..(i - diffString.length)) s += " "
-        s += diffString
+        var s: String
+        s = diffString
+        while (s.length <= i) s = " $s"
         when {
             diffString.toInt() < rhv -> {
                 if (flag) {
@@ -756,7 +757,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     }
 
     s = result[1]
-    while (s.length <= (lhv.toString() + " | ").length) s += " "
+    while (s.length <= ("$lhv | ").length) s += " "
     s += quotientString
     result[1] = s
 
