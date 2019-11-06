@@ -722,7 +722,8 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
                     quotientString += "0"
                     var subtrahend = "-0"
                     while (subtrahend.length <= i) subtrahend = " $subtrahend"
-                    val underLine = subtrahend.replace(Regex("""(\d)"""), "-")
+                    var underLine = diffString.replace(Regex("""(\d)"""), "-")
+                    while (underLine.length <= i) underLine = " $underLine"
                     result.add(subtrahend)
                     result.add(underLine)
                 }
