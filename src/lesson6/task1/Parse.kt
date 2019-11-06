@@ -145,7 +145,7 @@ fun dateDigitToStr(digital: String): String {
                 6 -> result += " июня "
                 7 -> result += " июля "
                 8 -> result += " августа "
-                9 -> result += " сентября"
+                9 -> result += " сентября "
                 10 -> result += " октября "
                 11 -> result += " ноября "
                 12 -> result += " декабря "
@@ -400,7 +400,7 @@ fun fromRoman(roman: String): Int {
         pevriousNum = num
         result += num
     }
-
+    if (result == 0) result = -1
     return result
 }
 
@@ -462,63 +462,67 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
     mem.fill(0)
 
     //выполение программы
-    var charToExecute = 0
-    while (stepCounter < limit) {
+    try {
+        var charToExecute = 0
+        while (stepCounter < limit) {
 
-        //исполнение одной команды
-        when (commands[charToExecute]) {
-            '>' -> {
-                adr++
-                if (adr >= cells) throw IllegalStateException("Out of range ($adr)")
-                charToExecute++
-            }
-            '<' -> {
-                adr--
-                if (adr < 0) throw IllegalStateException("Out of range ($adr)")
-                charToExecute++
-            }
-            '+' -> {
-                mem[adr]++
-                charToExecute++
-            }
-            '-' -> {
-                mem[adr]--
-                charToExecute++
-            }
-            '[' -> {
-                if (mem[adr] == 0) {
-                    //найдём парную закрывающую скобку
-                    bracketsCount = 1
+            //исполнение одной команды
+            when (commands[charToExecute]) {
+                '>' -> {
+                    adr++
+                    if (adr >= cells) throw IllegalStateException("Out of range ($adr)")
                     charToExecute++
-                    while (bracketsCount !=0) {
-                        if (commands[charToExecute] == '[') bracketsCount++
-                        if (commands[charToExecute] == ']') bracketsCount--
+                }
+                '<' -> {
+                    adr--
+                    if (adr < 0) throw IllegalStateException("Out of range ($adr)")
+                    charToExecute++
+                }
+                '+' -> {
+                    mem[adr]++
+                    charToExecute++
+                }
+                '-' -> {
+                    mem[adr]--
+                    charToExecute++
+                }
+                '[' -> {
+                    if (mem[adr] == 0) {
+                        //найдём парную закрывающую скобку
+                        bracketsCount = 1
+                        charToExecute++
+                        while (bracketsCount !=0) {
+                            if (commands[charToExecute] == '[') bracketsCount++
+                            if (commands[charToExecute] == ']') bracketsCount--
+                            charToExecute++
+                        }
+                    } else {
                         charToExecute++
                     }
-                } else {
-                    charToExecute++
                 }
-            }
-            ']' -> {
-                if (mem[adr] != 0) {
-                    //найдём парную открывающую скобку
-                    bracketsCount = 1
-                    charToExecute--
-                    while (bracketsCount !=0) {
-                        if (commands[charToExecute] == ']') bracketsCount++
-                        if (commands[charToExecute] == '[') bracketsCount--
+                ']' -> {
+                    if (mem[adr] != 0) {
+                        //найдём парную открывающую скобку
+                        bracketsCount = 1
                         charToExecute--
+                        while (bracketsCount !=0) {
+                            if (commands[charToExecute] == ']') bracketsCount++
+                            if (commands[charToExecute] == '[') bracketsCount--
+                            charToExecute--
+                        }
+                        charToExecute +=2
+                    } else {
+                        charToExecute++
                     }
-                    charToExecute +=2
-                } else {
-                    charToExecute++
                 }
-            }
-            ' ' -> charToExecute++
+                ' ' -> charToExecute++
 
+            }
+            stepCounter++
+            if (charToExecute == commands.length) break
         }
-        stepCounter++
-        if (charToExecute == commands.length) break
+    } catch (e: StringIndexOutOfBoundsException) {
+        return mem
     }
     return mem
 }
