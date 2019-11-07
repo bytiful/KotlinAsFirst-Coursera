@@ -707,6 +707,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     var diffString = ""
     val result = mutableListOf<String>()
     result.add(" $lhv | $rhv")
+
     var flag = false
     var i = 0
     for (ch in lhvString) {
@@ -766,8 +767,21 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     s += diffString
     result.add(s)
     val writer = File(outputName).bufferedWriter()
+
+    var startSpaceDelete = true
     for (l in result) {
-        writer.write(l)
+        val ch = l[0]
+        if (ch != ' ') {
+            startSpaceDelete = false
+            break
+        }
+    }
+
+    for (l in result) {
+        //удалим лишний пробел
+        if (startSpaceDelete) {
+            writer.write(l.replace(Regex("""^[\s]"""), ""))
+        } else writer.write(l)
         writer.newLine()
     }
     writer.close()
