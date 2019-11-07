@@ -181,7 +181,7 @@ fun alignFileByWidth(inputName: String, outputName: String) {
     for (line in lines) {
         var s = ""
         var lengthCurrentLine = 0
-        val words = line.split(" ")
+        val words = line.split(Regex("""\s+"""))
         for (word in words) {
             lengthCurrentLine += word.length
             //lengthCurrentLine += words.size - 1
@@ -763,6 +763,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     result[1] = s
 
     s = " "
+    diffString = "${diffString.toInt()}"
     for (n in 1..(i - diffString.length)) s += " "
     s += diffString
     result.add(s)
