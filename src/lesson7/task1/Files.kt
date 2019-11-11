@@ -127,7 +127,7 @@ fun centerFile(inputName: String, outputName: String) {
 
     for (line in File(inputName).readLines()) {
         lines.add(line)
-        maxLen = max(maxLen, line.length)
+        maxLen = max(maxLen, line.trim().length)
     }
 
     val writer = File(outputName).printWriter() //bufferedWriter()
@@ -752,6 +752,8 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         s = "-0"
         while (s.length < " $lhv".length) s = " $s"
         result.add(s)
+
+        if (lhv > 9) s = " $lhv"
         s = s.replace(Regex("""(\d)"""), "-")
         result.add(s)
         quotientString = "0"
